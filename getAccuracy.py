@@ -18,6 +18,8 @@ def getFiles(dir_path):
 def calcAcc(file_path):
     acc_list = []
     found_target = False
+    num_correct = 0
+    total_char = 0
 
     file = open(file_path, 'r')
 
@@ -35,6 +37,8 @@ def calcAcc(file_path):
             acc = ( correct_chars / len(expected_chars) ) * 100
             acc_list.append(acc)
             found_target = True
+            total_char += len(expected_chars)
+            num_correct += correct_chars
 
     file.close()
 
@@ -42,7 +46,7 @@ def calcAcc(file_path):
     if len(acc_list) == 0:
         acc_list.append(0)
 
-    return acc_list, found_target
+    return acc_list, found_target, num_correct, total_char
 
 def outputAccs(file_name, avg_accs):
 
@@ -56,30 +60,54 @@ def outputAccs(file_name, avg_accs):
 def main():
     files = getFiles(DATA_DIR)
     #print(len(files[0]))
+    correct_train = []
+    spelled_train = []
+    correct_ds = []
+    spelled_ds = []
     
+    #
     train_accs = []
     for file in files[0]:
-        accs, valid = calcAcc(file)
+        accs, valid, num_correct, num_spelled = calcAcc(file)
 
         # Subject XX does not have ds data so not useful in comparisons
         if valid and "Subject_XX" not in file:
             train_accs.append(accs)
+            correct_train.append(num_correct)
+            spelled_train.append(num_spelled)
+    #
     ds_accs = []
     for file in files[1]:
-        accs, valid = calcAcc(file)
+        accs, valid, num_correct, num_spelled = calcAcc(file)
         if valid:
             ds_accs.append(accs)
+            correct_ds.append(num_correct)
+            spelled_ds.append(num_spelled)
 
+    #
     train_avgs = []
     for accs in train_accs:
         avg = sum(accs) / len(accs)
         train_avgs.append(avg)
+    #
     ds_avgs = []
     for accs in ds_accs:
         avg = sum(accs) / len(accs)
         ds_avgs.append(avg)
 
-    outputAccs("train", train_avgs)
-    outputAccs("ds", ds_avgs)
+    #
+    train_correct = []
+    for i, correct in enumerate(correct_train):
+        train_correct.append( (correct / spelled_train[i]) * 100 )
+    #
+    ds_correct = []
+    for i, correct in enumerate(correct_ds):
+        ds_correct.append( (correct / spelled_ds[i]) * 100)
+
+    outputAccs("running_train", train_avgs)
+    outputAccs("running_ds", ds_avgs)
+
+    outputAccs("train", train_correct)
+    outputAccs("ds", ds_correct)
     
 main()
