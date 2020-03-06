@@ -6,7 +6,8 @@ import glob
 
 TARGET_STR = "Expected Copy Spelling Characters:"
 DIR_SEPARATOR = "/"
-DATA_DIR = "/Users/innocent/OneDrive - Duke University/Duke Grad/BCI/data_2012summer_dsLanguageModel"
+DATA_DIR = "C:\\Users\\wk55\\OneDrive - Duke University\\Duke Grad\\BCI\\data_2012summer_dsLanguageModel"
+#"/Users/innocent/OneDrive - Duke University/Duke Grad/BCI/data_2012summer_dsLanguageModel"
 
 def getFiles(dir_path):
 
@@ -64,6 +65,8 @@ def main():
     spelled_train = []
     correct_ds = []
     spelled_ds = []
+    total_ds = 0
+    total_train = 0
     
     #
     train_accs = []
@@ -75,6 +78,7 @@ def main():
             train_accs.append(accs)
             correct_train.append(num_correct)
             spelled_train.append(num_spelled)
+            total_train +=  num_spelled
     #
     ds_accs = []
     for file in files[1]:
@@ -83,6 +87,7 @@ def main():
             ds_accs.append(accs)
             correct_ds.append(num_correct)
             spelled_ds.append(num_spelled)
+            total_ds += num_spelled
 
     #
     train_avgs = []
@@ -109,5 +114,7 @@ def main():
 
     outputAccs("train", train_correct)
     outputAccs("ds", ds_correct)
+
+    outputAccs("totals", [total_train, total_ds, (total_train/16), (total_ds/16)])
     
 main()
